@@ -11,8 +11,8 @@
   <div class="grade-2">
     <label class="campo"><span>Telefone (WhatsApp) *</span>
       <input type="tel" name="telefone" required data-mascara-telefone placeholder="(11) 91234-5678" value="{{ cliente.telefone or '' }}"></label>
-    <label class="campo"><span>E-mail</span>
-      <input type="email" name="email" maxlength="120" placeholder="opcional" value="{{ cliente.email or '' }}"></label>
+    <label class="campo"><span>E-mail *</span>
+      <input type="email" name="email" required maxlength="120" placeholder="nome@exemplo.com" value="{{ cliente.email or '' }}"></label>
   </div>
   <div class="rodape-form">
     <a class="btn" href="{{ url_for('clientes.listar') }}">Voltar</a>

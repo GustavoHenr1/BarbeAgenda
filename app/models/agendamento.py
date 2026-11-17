@@ -55,10 +55,14 @@ def _enriquecer(linha):
 
 class Agendamento:
     @staticmethod
-    def listar(dia=None, id_profissional=None, status=None):
+    def listar(dia=None, id_profissional=None, status=None, ate=None):
+        """Lista agendamentos de um dia ou de um período (dia até "ate")."""
         sql = _SELECT_DETALHADO + " WHERE 1 = 1"
         params = []
-        if dia:
+        if dia and ate:
+            sql += " AND DATE(a.data_hora) BETWEEN ? AND ?"
+            params += [str(dia), str(ate)]
+        elif dia:
             sql += " AND DATE(a.data_hora) = ?"
             params.append(str(dia))
         if id_profissional:
@@ -77,7 +81,11 @@ class Agendamento:
 
     @classmethod
     def resumo_dia(cls, dia):
-        itens = cls.listar(dia=dia)
+        return cls.resumo(cls.listar(dia=dia))
+
+    @staticmethod
+    def resumo(itens):
+        """Indicadores calculados sobre a MESMA lista exibida (respeita os filtros)."""
         validos = [a for a in itens if a["status"] != "CANCELADO"]
         return {
             "total": len(validos),
@@ -138,6 +146,11 @@ class Agendamento:
             erros.append("Não é possível agendar em uma data/hora que já passou.")
         if inicio.weekday() not in cfg["DIAS_FUNCIONAMENTO"]:
             erros.append("A barbearia não funciona neste dia (aberta de segunda a sábado).")
+        if horario_mudou and not cls.horario_na_grade(inicio):
+            erros.append(
+                f"Horário inválido. Escolha um dos horários disponíveis (de {cfg['INTERVALO_MIN']} em "
+                f"{cfg['INTERVALO_MIN']} minutos, a partir das {cfg['HORA_ABERTURA']})."
+            )
 
         if servico:
             fim = inicio + timedelta(minutes=int(servico["duracao_min"]))
@@ -199,8 +212,16 @@ class Agendamento:
         executar("DELETE FROM agendamento WHERE id_agendamento = ?", (id_agendamento,))
         return []
 
+    @staticmethod
+    def horario_na_grade(inicio):
+        """True se o horário cai na grade de atendimento (ex.: 08:00, 08:30, 09:00...)."""
+        cfg = current_app.config
+        abertura = _hora(cfg["HORA_ABERTURA"])
+        minutos = (inicio.hour * 60 + inicio.minute) - (abertura.hour * 60 + abertura.minute)
+        return inicio.second == 0 and minutos % int(cfg["INTERVALO_MIN"]) == 0
+
     @classmethod
-    def horarios_livres(cls, id_profissional, id_servico, dia):
+    def horarios_livres(cls, id_profissional, id_servico, dia, ignorar_id=None):
         """Sugere horários livres (de 30 em 30 min) para o profissional no dia."""
         servico = Servico.buscar(id_servico)
         if not servico:
@@ -217,7 +238,7 @@ class Agendamento:
         fechamento = datetime.combine(d, _hora(cfg["HORA_FECHAMENTO"]))
         livres = []
         while atual + timedelta(minutes=duracao) <= fechamento:
-            if atual >= agora() and not cls.tem_conflito(id_profissional, atual, duracao):
+            if atual >= agora() and not cls.tem_conflito(id_profissional, atual, duracao, ignorar_id):
                 livres.append(atual.strftime("%H:%M"))
-            atual += timedelta(minutes=30)
+            atual += timedelta(minutes=int(cfg["INTERVALO_MIN"]))
         return livres

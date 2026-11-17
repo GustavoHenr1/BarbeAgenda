@@ -24,6 +24,8 @@ class Config:
     HORA_ABERTURA = "08:00"
     HORA_FECHAMENTO = "20:00"
     DIAS_FUNCIONAMENTO = [0, 1, 2, 3, 4, 5]  # segunda (0) a sábado (5)
+    INTERVALO_MIN = 30  # grade de horários: 08:00, 08:30, 09:00...
+    MAX_DIAS_PERIODO = 92  # limite do filtro "de ... até" na agenda
 
     # Cria o banco e dados de exemplo automaticamente na primeira execução (SQLite)
     SEED_DEMO = os.environ.get("SEED_DEMO", "1") == "1"

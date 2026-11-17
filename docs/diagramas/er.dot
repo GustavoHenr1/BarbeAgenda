@@ -7,13 +7,14 @@ digraph ER {
    <tr><td align="left">PK</td><td align="left"><b>id_cliente</b></td><td align="left">INT (PK, AI)</td></tr>
    <tr><td></td><td align="left">nome</td><td align="left">VARCHAR(100) NN</td></tr>
    <tr><td></td><td align="left">telefone</td><td align="left">VARCHAR(20) NN, UQ</td></tr>
-   <tr><td></td><td align="left">email</td><td align="left">VARCHAR(120)</td></tr>
+   <tr><td></td><td align="left">email</td><td align="left">VARCHAR(120) NN</td></tr>
    <tr><td></td><td align="left">data_cadastro</td><td align="left">DATETIME NN</td></tr></table>>];
   profissional [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="white">
    <tr><td colspan="3" bgcolor="#A8641C"><font color="white"><b>profissional</b></font></td></tr>
    <tr><td>PK</td><td align="left"><b>id_profissional</b></td><td align="left">INT (PK, AI)</td></tr>
    <tr><td></td><td align="left">nome</td><td align="left">VARCHAR(100) NN</td></tr>
    <tr><td></td><td align="left">telefone</td><td align="left">VARCHAR(20)</td></tr>
+   <tr><td></td><td align="left">email</td><td align="left">VARCHAR(120) NN</td></tr>
    <tr><td></td><td align="left">especialidade</td><td align="left">VARCHAR(100)</td></tr>
    <tr><td></td><td align="left">ativo</td><td align="left">TINYINT(1) NN</td></tr></table>>];
   servico [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="white">

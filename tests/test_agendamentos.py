@@ -96,7 +96,7 @@ def test_cliente_com_agendamento_nao_pode_ser_excluido(logado):
 
 
 def test_profissional_inativo_nao_recebe_agendamento(logado):
-    post(logado, "/profissionais/2/editar", nome="Rafael Souza", telefone="", especialidade="")
+    post(logado, "/profissionais/2/editar", nome="Rafael Souza", telefone="", especialidade="", email="r@b.com")
     html = agendar(logado, prof=2)
     assert "inativo" in html
 
@@ -115,3 +115,69 @@ def test_historico_do_cliente(logado):
     html = logado.get("/clientes/1").get_data(as_text=True)
     assert "Histórico de atendimentos" in html
     assert "Corte masculino" in html
+
+
+# ---------------------------------------------------------------------
+# Versão 1.1 — correções apontadas nos testes com os colegas
+# ---------------------------------------------------------------------
+def test_horario_fora_da_grade_e_recusado(logado):
+    """Luiz Felipe: era possível agendar às 15:32."""
+    html = agendar(logado, hora="15:32")
+    assert "Horário inválido" in html
+    assert "Agendamento salvo com sucesso" not in html
+
+
+def test_horario_na_grade_e_aceito(logado):
+    assert "Agendamento salvo com sucesso" in agendar(logado, hora="15:30")
+
+
+def test_editar_sem_mudar_horario_nao_exige_grade(logado, app):
+    """Agendamentos antigos fora da grade continuam editáveis (ex.: só trocar a observação)."""
+    dia = proxima_segunda().isoformat()
+    with app.app_context():
+        from app.models.db import executar
+        executar("INSERT INTO agendamento (id_cliente,id_profissional,id_servico,id_usuario,data_hora) "
+                 "VALUES (1,1,1,1,?)", (f"{dia} 10:10:00",))
+    html = post(logado, "/agendamentos/1/editar", id_cliente=1, id_profissional=1, id_servico=1,
+                data=dia, hora="10:10", observacao="ok").get_data(as_text=True)
+    assert "Agendamento salvo com sucesso" in html
+
+
+def test_resumo_respeita_filtro_de_profissional(logado):
+    """Luiz: com filtro de profissional, os totais mostravam o dia inteiro."""
+    dia = proxima_segunda().isoformat()
+    agendar(logado, hora="09:00", dia=dia, prof=1)
+    agendar(logado, hora="10:00", dia=dia, prof=1, cliente=2)
+    agendar(logado, hora="09:00", dia=dia, prof=2, cliente=3)
+    html = logado.get(f"/agendamentos/?data={dia}&profissional=1").get_data(as_text=True)
+    total = html.split("Atendimentos</span>")[1].split("</span>")[0]
+    assert ">2" in total
+    assert "R$ 80,00" in html
+
+
+def test_filtro_por_periodo_data_ate(logado):
+    """Luigi: filtrar vários dias com o campo "até"."""
+    seg = proxima_segunda()
+    ter = seg + timedelta(days=1)
+    agendar(logado, hora="09:00", dia=seg.isoformat())
+    agendar(logado, hora="11:00", dia=ter.isoformat(), cliente=2)
+    html = logado.get(f"/agendamentos/?data={seg.isoformat()}&ate={ter.isoformat()}").get_data(as_text=True)
+    assert "João Pereira" in html and "Marcos Lima" in html
+    assert "período de 2 dias" in html
+    # sem o "até", mostra só o primeiro dia
+    html = logado.get(f"/agendamentos/?data={seg.isoformat()}").get_data(as_text=True)
+    assert "João Pereira" in html and "Marcos Lima" not in html
+
+
+def test_periodo_com_data_final_antes_da_inicial(logado):
+    seg = proxima_segunda()
+    html = logado.get(f"/agendamentos/?data={seg.isoformat()}&ate={(seg - timedelta(days=3)).isoformat()}",
+                      follow_redirects=True).get_data(as_text=True)
+    assert "não pode ser anterior" in html
+
+
+def test_api_horarios_livres_ignora_o_proprio_agendamento(logado):
+    dia = proxima_segunda().isoformat()
+    agendar(logado, hora="08:00", dia=dia)
+    livres = logado.get(f"/agendamentos/horarios-livres?profissional=1&servico=1&data={dia}&ignorar=1").get_json()
+    assert "08:00" in livres

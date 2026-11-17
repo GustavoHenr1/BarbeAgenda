@@ -106,6 +106,25 @@ def init_db(seed_demo=False):
         _dados_exemplo()
 
 
+def migrar():
+    """Atualiza bancos criados pela versão 1.0 (adiciona colunas novas).
+
+    Bancos novos já são criados completos pelo script schema_*.sql.
+    """
+    if _mysql():
+        existe = consultar(
+            "SELECT COUNT(*) AS n FROM information_schema.COLUMNS "
+            "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'profissional' AND COLUMN_NAME = 'email'",
+            um=True,
+        )
+        if existe and not existe["n"]:
+            executar("ALTER TABLE profissional ADD COLUMN email VARCHAR(120) NULL AFTER telefone")
+        return
+    colunas = [c["name"] for c in consultar("PRAGMA table_info(profissional)")]
+    if colunas and "email" not in colunas:
+        executar("ALTER TABLE profissional ADD COLUMN email TEXT")
+
+
 def _dados_exemplo():
     servicos = [
         ("Corte masculino", "Corte na tesoura ou máquina", 40.00, 30),
@@ -116,13 +135,13 @@ def _dados_exemplo():
     for s in servicos:
         executar("INSERT INTO servico (nome, descricao, preco, duracao_min) VALUES (?, ?, ?, ?)", s)
     for p in [
-        ("Carlos Silva", "(11) 98888-1111", "Cortes clássicos"),
-        ("Rafael Souza", "(11) 97777-2222", "Barba e degradê"),
+        ("Carlos Silva", "(11) 98888-1111", "carlos@barberagenda.com", "Cortes clássicos"),
+        ("Rafael Souza", "(11) 97777-2222", "rafael@barberagenda.com", "Barba e degradê"),
     ]:
-        executar("INSERT INTO profissional (nome, telefone, especialidade) VALUES (?, ?, ?)", p)
+        executar("INSERT INTO profissional (nome, telefone, email, especialidade) VALUES (?, ?, ?, ?)", p)
     for c in [
         ("João Pereira", "(11) 91234-5678", "joao@email.com"),
-        ("Marcos Lima", "(11) 92345-6789", None),
+        ("Marcos Lima", "(11) 92345-6789", "marcos@email.com"),
         ("Pedro Alves", "(11) 93456-7890", "pedro@email.com"),
     ]:
         executar("INSERT INTO cliente (nome, telefone, email) VALUES (?, ?, ?)", c)

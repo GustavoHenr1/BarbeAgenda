@@ -20,6 +20,8 @@ class Profissional:
         v.obrigatorio(erros, dados.get("nome"), "Nome")
         v.tamanho_max(erros, dados.get("nome"), 100, "Nome")
         v.telefone(erros, dados.get("telefone"), obrigatorio_=False)
+        v.email(erros, dados.get("email"), obrigatorio_=True)
+        v.tamanho_max(erros, dados.get("email"), 120, "E-mail")
         v.tamanho_max(erros, dados.get("especialidade"), 100, "Especialidade")
         return erros
 
@@ -31,17 +33,19 @@ class Profissional:
         valores = (
             v.texto(dados.get("nome")),
             v.formatar_telefone(dados.get("telefone")) or None,
+            v.texto(dados.get("email")),
             v.texto(dados.get("especialidade")) or None,
             1 if dados.get("ativo") else 0,
         )
         if id_profissional:
             executar(
-                "UPDATE profissional SET nome = ?, telefone = ?, especialidade = ?, ativo = ? WHERE id_profissional = ?",
+                "UPDATE profissional SET nome = ?, telefone = ?, email = ?, especialidade = ?, ativo = ? "
+                "WHERE id_profissional = ?",
                 valores + (id_profissional,),
             )
             return id_profissional, []
         return executar(
-            "INSERT INTO profissional (nome, telefone, especialidade, ativo) VALUES (?, ?, ?, ?)", valores
+            "INSERT INTO profissional (nome, telefone, email, especialidade, ativo) VALUES (?, ?, ?, ?, ?)", valores
         ), []
 
     @staticmethod

@@ -55,6 +55,13 @@ def create_app(config_extra=None):
         with app.app_context():
             db.init_db(seed_demo=app.config["SEED_DEMO"])
 
+    # Atualiza bancos criados por versões anteriores (ex.: coluna e-mail do profissional)
+    with app.app_context():
+        try:
+            db.migrar()
+        except Exception as erro:  # não impede o sistema de abrir; o erro fica no log
+            app.logger.warning("Não foi possível migrar o banco: %s", erro)
+
     return app
 
 

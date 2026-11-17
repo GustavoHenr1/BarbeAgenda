@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS cliente (
     id_cliente     INTEGER PRIMARY KEY AUTOINCREMENT,
     nome           TEXT NOT NULL,
     telefone       TEXT NOT NULL UNIQUE,
-    email          TEXT,
+    email          TEXT NOT NULL,
     data_cadastro  TEXT NOT NULL DEFAULT (datetime('now','localtime'))
 );
 
@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS profissional (
     id_profissional  INTEGER PRIMARY KEY AUTOINCREMENT,
     nome             TEXT NOT NULL,
     telefone         TEXT,
+    email            TEXT NOT NULL,
     especialidade    TEXT,
     ativo            INTEGER NOT NULL DEFAULT 1 CHECK (ativo IN (0,1))
 );

@@ -20,7 +20,7 @@ def test_cliente_email_invalido(logado):
 
 
 def test_cliente_telefone_duplicado(logado):
-    html = post(logado, "/clientes/novo", nome="Outro", telefone="(11) 91234-5678").get_data(as_text=True)
+    html = post(logado, "/clientes/novo", nome="Outro", telefone="(11) 91234-5678", email="outro@email.com").get_data(as_text=True)
     assert "Já existe um cliente cadastrado com este telefone" in html
 
 
@@ -31,7 +31,7 @@ def test_buscar_cliente(logado):
 
 
 def test_editar_e_excluir_cliente(logado):
-    post(logado, "/clientes/1/editar", nome="João P. Pereira", telefone="(11) 91234-5678", email="")
+    post(logado, "/clientes/1/editar", nome="João P. Pereira", telefone="(11) 91234-5678", email="joao@email.com")
     assert "João P. Pereira" in logado.get("/clientes/").get_data(as_text=True)
     html = post(logado, "/clientes/1/excluir").get_data(as_text=True)
     assert "Cliente excluído" in html
@@ -55,10 +55,43 @@ def test_servico_nome_duplicado(logado):
 
 
 def test_profissional_cadastro_e_desativacao(logado):
-    post(logado, "/profissionais/novo", nome="Lucas", especialidade="Navalhado", telefone="", ativo="1")
-    html = post(logado, "/profissionais/3/editar", nome="Lucas", especialidade="Navalhado", telefone="").get_data(as_text=True)
+    post(logado, "/profissionais/novo", nome="Lucas", especialidade="Navalhado", telefone="", email="lucas@b.com", ativo="1")
+    html = post(logado, "/profissionais/3/editar", nome="Lucas", especialidade="Navalhado", telefone="",
+                email="lucas@b.com").get_data(as_text=True)
     assert "Inativo" in html
 
 
 def test_pagina_inexistente(logado):
     assert logado.get("/clientes/999/editar").status_code == 404
+
+
+# ---------------------------------------------------------------------
+# Versão 1.1 — correções apontadas nos testes com os colegas
+# ---------------------------------------------------------------------
+def test_email_obrigatorio_no_cliente(logado):
+    html = post(logado, "/clientes/novo", nome="Sem Email", telefone="11988887777", email="").get_data(as_text=True)
+    assert "O campo E-mail é obrigatório" in html
+
+
+def test_email_obrigatorio_no_profissional(logado):
+    html = post(logado, "/profissionais/novo", nome="Sem Email", telefone="", email="", ativo="1").get_data(as_text=True)
+    assert "O campo E-mail é obrigatório" in html
+
+
+def test_profissional_salva_email(logado):
+    html = post(logado, "/profissionais/novo", nome="Bruno", telefone="", email="bruno@barber.com",
+                ativo="1").get_data(as_text=True)
+    assert "Profissional salvo com sucesso" in html
+    assert "bruno@barber.com" in html
+
+
+def test_telefone_com_codigo_do_pais(logado):
+    html = post(logado, "/clientes/novo", nome="Ana", telefone="+55 61 98466-0000", email="ana@e.com").get_data(as_text=True)
+    assert "Cliente salvo com sucesso" in html
+    assert "(61) 98466-0000" in html
+
+
+def test_telefone_fixo_formatado(logado):
+    html = post(logado, "/profissionais/novo", nome="Rui", telefone="6133334444", email="rui@e.com",
+                ativo="1").get_data(as_text=True)
+    assert "(61) 3333-4444" in html

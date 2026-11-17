@@ -9,13 +9,14 @@
 {% if profissionais %}
   <div class="tabela-wrap">
   <table class="tabela">
-    <thead><tr><th>Nome</th><th>Especialidade</th><th>Telefone</th><th>Situação</th><th class="acoes-col">Ações</th></tr></thead>
+    <thead><tr><th>Nome</th><th>Especialidade</th><th>Telefone</th><th>E-mail</th><th>Situação</th><th class="acoes-col">Ações</th></tr></thead>
     <tbody>
     {% for p in profissionais %}
       <tr class="{{ 'linha-inativa' if not p.ativo }}">
         <td><strong>{{ p.nome }}</strong></td>
         <td>{{ p.especialidade or '—' }}</td>
         <td>{{ p.telefone or '—' }}</td>
+        <td>{{ p.email or '—' }}</td>
         <td><span class="selo {{ 'selo-concluido' if p.ativo else 'selo-cancelado' }}">{{ 'Ativo' if p.ativo else 'Inativo' }}</span></td>
         <td class="acoes-cel"><div class="acoes">
           <a class="btn btn-mini" href="{{ url_for('agendamentos.listar', profissional=p.id_profissional) }}">Agenda</a>

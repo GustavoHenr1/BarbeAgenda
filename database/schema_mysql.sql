@@ -1,6 +1,7 @@
 -- =====================================================================
 --  BarberAgenda - Sistema de Agendamento para Barbearia
 --  PROJETO FÍSICO DO BANCO DE DADOS (MySQL 8.x)
+--  Versão 1.1 (e-mail obrigatório para cliente e profissional)
 --  Gerado a partir do Diagrama de Classes (classes de persistência):
 --  Usuario, Cliente, Profissional, Servico e Agendamento
 -- =====================================================================
@@ -32,7 +33,7 @@ CREATE TABLE cliente (
     id_cliente     INT           NOT NULL AUTO_INCREMENT,
     nome           VARCHAR(100)  NOT NULL,
     telefone       VARCHAR(20)   NOT NULL,
-    email          VARCHAR(120)  NULL,
+    email          VARCHAR(120)  NOT NULL,
     data_cadastro  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_cliente PRIMARY KEY (id_cliente),
     CONSTRAINT uq_cliente_telefone UNIQUE (telefone)
@@ -45,6 +46,7 @@ CREATE TABLE profissional (
     id_profissional  INT           NOT NULL AUTO_INCREMENT,
     nome             VARCHAR(100)  NOT NULL,
     telefone         VARCHAR(20)   NULL,
+    email            VARCHAR(120)  NOT NULL,
     especialidade    VARCHAR(100)  NULL,
     ativo            TINYINT(1)    NOT NULL DEFAULT 1,
     CONSTRAINT pk_profissional PRIMARY KEY (id_profissional),
@@ -123,6 +125,12 @@ INSERT INTO servico (nome, descricao, preco, duracao_min) VALUES
     ('Corte + Barba',   'Combo corte e barba',          65.00, 60),
     ('Sobrancelha',     'Acabamento na navalha',        15.00, 15);
 
-INSERT INTO profissional (nome, telefone, especialidade) VALUES
-    ('Carlos Silva', '(11) 98888-1111', 'Cortes clássicos'),
-    ('Rafael Souza', '(11) 97777-2222', 'Barba e degradê');
+INSERT INTO profissional (nome, telefone, email, especialidade) VALUES
+    ('Carlos Silva', '(11) 98888-1111', 'carlos@barberagenda.com', 'Cortes clássicos'),
+    ('Rafael Souza', '(11) 97777-2222', 'rafael@barberagenda.com', 'Barba e degradê');
+
+-- ---------------------------------------------------------------------
+-- Migração (versão 1.1): para um banco criado com a versão 1.0, rode:
+--   ALTER TABLE profissional ADD COLUMN email VARCHAR(120) NULL AFTER telefone;
+-- (o sistema também faz essa migração sozinho ao iniciar)
+-- ---------------------------------------------------------------------

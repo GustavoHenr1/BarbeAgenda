@@ -29,7 +29,7 @@ class Cliente:
         v.obrigatorio(erros, dados.get("nome"), "Nome")
         v.tamanho_max(erros, dados.get("nome"), 100, "Nome")
         v.telefone(erros, dados.get("telefone"))
-        v.email(erros, dados.get("email"))
+        v.email(erros, dados.get("email"), obrigatorio_=True)
         v.tamanho_max(erros, dados.get("email"), 120, "E-mail")
         return erros
 

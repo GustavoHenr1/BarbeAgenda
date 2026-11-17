@@ -1,7 +1,7 @@
 """Controller de agendamentos."""
 from datetime import date, timedelta
 
-from flask import Blueprint, abort, flash, g, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, abort, current_app, flash, g, jsonify, redirect, render_template, request, url_for
 
 from app.models import Agendamento, Cliente, Profissional, Servico
 from .auth_controller import login_obrigatorio
@@ -9,26 +9,42 @@ from .auth_controller import login_obrigatorio
 bp = Blueprint("agendamentos", __name__, url_prefix="/agendamentos")
 
 
-def _dia_param():
+def _data_param(nome, padrao=None):
     try:
-        return date.fromisoformat(request.args.get("data", ""))
+        return date.fromisoformat(request.args.get(nome, ""))
     except ValueError:
-        return date.today()
+        return padrao
 
 
 @bp.route("/")
 @login_obrigatorio
 def listar():
-    dia = _dia_param()
+    dia = _data_param("data", date.today())
+    ate = _data_param("ate")
+    if ate and ate < dia:
+        flash("A data final não pode ser anterior à data inicial. Mostrando somente o dia inicial.", "aviso")
+        ate = None
+    if ate and (ate - dia).days > current_app.config["MAX_DIAS_PERIODO"]:
+        ate = dia + timedelta(days=current_app.config["MAX_DIAS_PERIODO"])
+        flash(f"O período foi limitado a {current_app.config['MAX_DIAS_PERIODO']} dias.", "aviso")
+    if ate == dia:
+        ate = None
+
     id_prof = request.args.get("profissional", type=int)
     status = request.args.get("status") or None
+    agenda = Agendamento.listar(dia=dia.isoformat(), ate=ate.isoformat() if ate else None,
+                                id_profissional=id_prof, status=status)
+
+    # setas ← → andam um período inteiro (1 dia, ou o tamanho do intervalo escolhido)
+    passo = timedelta(days=((ate - dia).days + 1) if ate else 1)
     return render_template(
         "agendamentos/lista.html",
         dia=dia,
-        dia_anterior=dia - timedelta(days=1),
-        dia_seguinte=dia + timedelta(days=1),
-        agenda=Agendamento.listar(dia=dia.isoformat(), id_profissional=id_prof, status=status),
-        resumo=Agendamento.resumo_dia(dia.isoformat()),
+        ate=ate,
+        anterior=(dia - passo, ate - passo if ate else None),
+        seguinte=(dia + passo, ate + passo if ate else None),
+        agenda=agenda,
+        resumo=Agendamento.resumo(agenda),
         profissionais=Profissional.listar(),
         filtro_prof=id_prof,
         filtro_status=status,
@@ -108,5 +124,6 @@ def horarios_livres():
             request.args.get("profissional", type=int),
             request.args.get("servico", type=int),
             request.args.get("data", ""),
+            request.args.get("ignorar", type=int),
         )
     )

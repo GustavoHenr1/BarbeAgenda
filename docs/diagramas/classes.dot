@@ -12,7 +12,7 @@ digraph G {
    <tr><td align="left" balign="left" border="1" sides="T">+ listar(busca): List<br/>+ salvar(dados): int<br/>+ excluir(id): void<br/>+ validar(dados): List</td></tr></table>>];
   Profissional [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#FFF8EE">
    <tr><td bgcolor="#A8641C"><font color="white"><b>Profissional</b></font></td></tr>
-   <tr><td align="left" balign="left">- idProfissional: int<br/>- nome: String<br/>- telefone: String<br/>- especialidade: String<br/>- ativo: boolean</td></tr>
+   <tr><td align="left" balign="left">- idProfissional: int<br/>- nome: String<br/>- telefone: String<br/>- email: String<br/>- especialidade: String<br/>- ativo: boolean</td></tr>
    <tr><td align="left" balign="left" border="1" sides="T">+ listar(somenteAtivos): List<br/>+ salvar(dados): int<br/>+ excluir(id): void</td></tr></table>>];
   Servico [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#FFF8EE">
    <tr><td bgcolor="#A8641C"><font color="white"><b>Servico</b></font></td></tr>

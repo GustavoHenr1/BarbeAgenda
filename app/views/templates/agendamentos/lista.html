@@ -3,18 +3,25 @@
 {% block conteudo %}
 <div class="cabecalho">
   <div>
+    {% if ate %}
+    <p class="sobretitulo">Agenda · período de {{ (ate - dia).days + 1 }} dias</p>
+    <h1>{{ dia|data_br }} a {{ ate|data_br }}</h1>
+    {% else %}
     <p class="sobretitulo">Agenda</p>
     <h1>{{ dia|dia_semana|capitalize }}, {{ dia|data_br }}</h1>
+    {% endif %}
   </div>
   <a class="btn btn-primario" href="{{ url_for('agendamentos.formulario', data=dia.isoformat()) }}">+ Novo agendamento</a>
 </div>
 
 <form class="filtros cartao" method="get">
   <div class="navegacao-dia">
-    <a class="btn btn-mini" href="{{ url_for('agendamentos.listar', data=dia_anterior.isoformat(), profissional=filtro_prof, status=filtro_status) }}" aria-label="Dia anterior">←</a>
-    <input type="date" name="data" value="{{ dia.isoformat() }}" data-auto-submit>
-    <a class="btn btn-mini" href="{{ url_for('agendamentos.listar', data=dia_seguinte.isoformat(), profissional=filtro_prof, status=filtro_status) }}" aria-label="Próximo dia">→</a>
+    <a class="btn btn-mini" href="{{ url_for('agendamentos.listar', data=anterior[0].isoformat(), ate=anterior[1].isoformat() if anterior[1] else None, profissional=filtro_prof, status=filtro_status) }}" aria-label="Período anterior">←</a>
+    <label class="campo-inline">De <input type="date" name="data" value="{{ dia.isoformat() }}" data-auto-submit></label>
+    <label class="campo-inline">até <input type="date" name="ate" value="{{ ate.isoformat() if ate else '' }}" min="{{ dia.isoformat() }}" data-auto-submit title="Opcional: escolha uma data final para ver vários dias"></label>
+    <a class="btn btn-mini" href="{{ url_for('agendamentos.listar', data=seguinte[0].isoformat(), ate=seguinte[1].isoformat() if seguinte[1] else None, profissional=filtro_prof, status=filtro_status) }}" aria-label="Próximo período">→</a>
     <a class="btn btn-mini" href="{{ url_for('agendamentos.listar') }}">Hoje</a>
+    {% if ate %}<a class="btn-link pequeno" href="{{ url_for('agendamentos.listar', data=dia.isoformat(), profissional=filtro_prof, status=filtro_status) }}">limpar período</a>{% endif %}
   </div>
   <label class="campo-inline">Profissional
     <select name="profissional" data-auto-submit>
@@ -41,6 +48,6 @@
 </section>
 
 <section class="cartao">
-  {% with voltar=request.full_path %}{% include "_agenda_tabela.html" %}{% endwith %}
+  {% with voltar=request.full_path, mostrar_data=ate %}{% include "_agenda_tabela.html" %}{% endwith %}
 </section>
 {% endblock %}

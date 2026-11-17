@@ -8,7 +8,7 @@
   <tbody>
   {% for a in agenda %}
     <tr class="linha-{{ a.status|lower }}">
-      <td class="hora"><strong>{{ a.hora }}</strong><span class="sutil"> – {{ a.hora_fim }}</span></td>
+      <td class="hora">{% if mostrar_data %}<div class="pequeno sutil">{{ a.data|data_br }}</div>{% endif %}<strong>{{ a.hora }}</strong><span class="sutil"> – {{ a.hora_fim }}</span></td>
       <td><a href="{{ url_for('clientes.detalhe', id_cliente=a.id_cliente) }}">{{ a.cliente }}</a><div class="sutil pequeno">{{ a.cliente_telefone }}</div></td>
       <td>{{ a.servico }}{% if a.observacao %}<div class="sutil pequeno">{{ a.observacao }}</div>{% endif %}</td>
       <td data-rotulo="Profissional">{{ a.profissional }}</td>
@@ -42,6 +42,6 @@
 </div>
 {% else %}
   <div class="vazio">
-    <p>Nenhum agendamento para este dia.</p>
+    <p>Nenhum agendamento {{ 'neste período' if mostrar_data else 'para este dia' }}.</p>
   </div>
 {% endif %}

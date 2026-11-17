@@ -13,7 +13,7 @@
 {% endif %}
 
 <form method="post" class="cartao formulario" id="form-agendamento"
-      data-url-horarios="{{ url_for('agendamentos.horarios_livres') }}">
+      data-url-horarios="{{ url_for('agendamentos.horarios_livres') }}" data-ignorar="{{ id_agendamento or '' }}">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <div class="grade-2">
     <label class="campo">
@@ -45,13 +45,14 @@
       </label>
       <label class="campo">
         <span>Horário *</span>
-        <input type="time" name="hora" required step="300" value="{{ ag.hora or '' }}">
+        <input type="time" name="hora" required step="{{ config.INTERVALO_MIN * 60 }}" min="{{ config.HORA_ABERTURA }}" max="{{ config.HORA_FECHAMENTO }}" value="{{ ag.hora or '' }}" aria-describedby="aviso-horario">
+        <small id="aviso-horario" class="aviso-campo" hidden></small>
       </label>
     </div>
   </div>
 
   <div class="horarios" id="horarios" hidden>
-    <span class="sutil">Horários livres:</span>
+    <span class="sutil">Horários livres (clique para escolher):</span>
     <div class="horarios-lista" id="horarios-lista"></div>
   </div>
 

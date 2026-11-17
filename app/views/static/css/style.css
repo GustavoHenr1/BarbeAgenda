@@ -149,11 +149,12 @@ input:focus, select:focus { border-color: var(--destaque); }
 
 .busca { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; max-width: 560px; }
 .filtros { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; padding: 14px 18px; }
-.navegacao-dia { display: flex; gap: 6px; align-items: center; }
+.navegacao-dia { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .navegacao-dia input { width: auto; }
 .campo-inline { display: flex; align-items: center; gap: 8px; font-weight: 550; font-size: .9rem; }
 .campo-inline select { width: auto; min-width: 150px; }
 
+.aviso-campo { color: var(--perigo); font-weight: 550; }
 .horarios { margin: -4px 0 16px; padding: 12px 14px; background: #faf8f4; border: 1px dashed var(--borda); border-radius: 8px; }
 .horarios-lista { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .horario { border: 1px solid #e0cdb2; background: #fff; color: var(--destaque-escuro); border-radius: 6px; padding: 4px 9px; font: inherit; font-size: .85rem; cursor: pointer; font-variant-numeric: tabular-nums; }
@@ -202,6 +203,9 @@ input:focus, select:focus { border-color: var(--destaque); }
   .btn-menu { background: none; border: 0; color: #fff; font-size: 1.4rem; cursor: pointer; }
   .principal { padding: 20px 16px 48px; }
   .grade-2 { grid-template-columns: 1fr; }
+  .filtros { gap: 12px; }
+  .navegacao-dia .campo-inline { flex: 1 1 140px; }
+  .navegacao-dia .campo-inline input { flex: 1; min-width: 0; }
   /* No celular, cada linha da tabela vira um cartão empilhado */
   .tabela thead { display: none; }
   .tabela, .tabela tbody, .tabela tr, .tabela td { display: block; width: 100%; }

@@ -12,11 +12,11 @@ graph G {
   USUARIO -- registra [label="1"]; registra -- AGENDAMENTO [label="N"];
   node [shape=ellipse, style=filled, fillcolor=white, color="#999999", width=0.3, height=0.3, fontsize=10];
   c1 [label=<<u>id_cliente</u>>, pos="-1.9,4!"]; c2 [label="nome", pos="-0.3,4.3!"]; c3 [label="telefone", pos="1.4,4.1!"]; c4 [label="email", pos="-2.2,3!"];
-  p1 [label=<<u>id_profissional</u>>, pos="6.6,4.2!"]; p2 [label="nome", pos="8.3,4.3!"]; p3 [label="especialidade", pos="10,3.9!"]; p4 [label="ativo", pos="10.2,2.9!"];
+  p1 [label=<<u>id_profissional</u>>, pos="6.6,4.2!"]; p2 [label="nome", pos="8.3,4.3!"]; p3 [label="especialidade", pos="10,3.9!"]; p4 [label="ativo", pos="10.2,2.9!"]; p5 [label="email", pos="9.6,2.1!"];
   s1 [label=<<u>id_servico</u>>, pos="-2,-0.9!"]; s2 [label="nome", pos="-2.2,-1.8!"]; s3 [label="preço", pos="-1.4,-2.6!"]; s4 [label="duração", pos="0.5,-2.7!"];
   u1 [label=<<u>id_usuario</u>>, pos="10.1,-1!"]; u2 [label="login", pos="10.3,-1.9!"]; u3 [label="perfil", pos="9.3,-2.7!"]; u4 [label="nome", pos="7.6,-2.7!"];
   a1 [label=<<u>id_agendamento</u>>, pos="2.5,2.6!"]; a2 [label="data_hora", pos="5.6,2.7!"]; a3 [label="status", pos="4,-0.9!"]; a4 [label="observação", pos="5.4,-0.2!"];
-  CLIENTE -- {c1 c2 c3 c4}; PROFISSIONAL -- {p1 p2 p3 p4}; SERVICO -- {s1 s2 s3 s4}; USUARIO -- {u1 u2 u3 u4};
+  CLIENTE -- {c1 c2 c3 c4}; PROFISSIONAL -- {p1 p2 p3 p4 p5}; SERVICO -- {s1 s2 s3 s4}; USUARIO -- {u1 u2 u3 u4};
   AGENDAMENTO -- {a1 a2 a3}; 
   AGENDAMENTO -- a4;
 }
