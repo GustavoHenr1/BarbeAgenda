@@ -1,0 +1,14 @@
+digraph UC {
+  rankdir=LR; bgcolor=white; nodesep=0.25; ranksep=1.2;
+  node [fontname="Helvetica", fontsize=11];
+  edge [color="#555555", arrowhead=none];
+  subgraph cluster_sis { label="BarberAgenda"; fontname="Helvetica-Bold"; fontsize=13; style="rounded"; color="#8A4F12"; margin=18;
+    node [shape=ellipse, style=filled, fillcolor="#F6EAD9", color="#8A4F12", width=2.6];
+    uc1 [label="UC01 Fazer login"]; uc2 [label="UC02 Manter clientes"]; uc3 [label="UC03 Manter profissionais"];
+    uc4 [label="UC04 Manter serviços"]; uc5 [label="UC05 Agendar atendimento"]; uc6 [label="UC06 Consultar agenda do dia"];
+    uc7 [label="UC07 Concluir / cancelar / reabrir"]; uc8 [label="UC08 Consultar horários livres"]; uc9 [label="UC09 Ver histórico do cliente"];
+    uc5 -> uc8 [style=dashed, arrowhead=vee, label=" «include»", fontsize=9, fontname="Helvetica"];
+  }
+  ator [shape=none, label=<<table border="0"><tr><td><font point-size="34">웃</font></td></tr><tr><td>Atendente / Dono<br/>(Usuário)</td></tr></table>>];
+  ator -> {uc1 uc2 uc3 uc4 uc5 uc6 uc7 uc9};
+}

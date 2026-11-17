@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}BarberAgenda{% endblock %} · BarberAgenda</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+{% if g.usuario %}
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <a class="marca" href="{{ url_for('dashboard.index') }}">
+      <span class="marca-icone" aria-hidden="true">✂</span>
+      <span>Barber<strong>Agenda</strong></span>
+    </a>
+    <nav class="menu">
+      {% set ep = request.endpoint or '' %}
+      <a href="{{ url_for('dashboard.index') }}" class="{{ 'ativo' if ep.startswith('dashboard') }}">Início</a>
+      <a href="{{ url_for('agendamentos.listar') }}" class="{{ 'ativo' if ep.startswith('agendamentos') }}">Agenda</a>
+      <a href="{{ url_for('clientes.listar') }}" class="{{ 'ativo' if ep.startswith('clientes') }}">Clientes</a>
+      <a href="{{ url_for('profissionais.listar') }}" class="{{ 'ativo' if ep.startswith('profissionais') }}">Profissionais</a>
+      <a href="{{ url_for('servicos.listar') }}" class="{{ 'ativo' if ep.startswith('servicos') }}">Serviços</a>
+    </nav>
+    <div class="usuario">
+      <div>
+        <div class="usuario-nome">{{ g.usuario.nome }}</div>
+        <div class="usuario-perfil">{{ g.usuario.perfil|lower }}</div>
+      </div>
+      <form method="post" action="{{ url_for('auth.logout') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn-link" type="submit">Sair</button>
+      </form>
+    </div>
+  </aside>
+  <div class="conteudo">
+    <header class="topo-mobile">
+      <button class="btn-menu" type="button" data-toggle-menu aria-label="Abrir menu">☰</button>
+      <span>Barber<strong>Agenda</strong></span>
+    </header>
+    <main class="principal">
+      {% include "_mensagens.html" %}
+      {% block conteudo %}{% endblock %}
+    </main>
+  </div>
+</div>
+{% else %}
+  {% block publico %}{% endblock %}
+{% endif %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block titulo %}{{ 'Editar' if id_agendamento else 'Novo' }} agendamento{% endblock %}
+{% block conteudo %}
+<div class="cabecalho">
+  <div>
+    <p class="sobretitulo"><a href="{{ url_for('agendamentos.listar', data=ag.data) }}">← Agenda</a></p>
+    <h1>{{ 'Editar' if id_agendamento else 'Novo' }} agendamento</h1>
+  </div>
+</div>
+
+{% if not clientes %}
+  <div class="alerta alerta-aviso">Cadastre um cliente antes de agendar. <a href="{{ url_for('clientes.formulario') }}">Cadastrar cliente</a></div>
+{% endif %}
+
+<form method="post" class="cartao formulario" id="form-agendamento"
+      data-url-horarios="{{ url_for('agendamentos.horarios_livres') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="grade-2">
+    <label class="campo">
+      <span>Cliente *</span>
+      <select name="id_cliente" required>
+        <option value="">Selecione…</option>
+        {% for c in clientes %}<option value="{{ c.id_cliente }}" {{ 'selected' if ag.id_cliente == c.id_cliente }}>{{ c.nome }} · {{ c.telefone }}</option>{% endfor %}
+      </select>
+      <small><a href="{{ url_for('clientes.formulario') }}">+ cadastrar novo cliente</a></small>
+    </label>
+    <label class="campo">
+      <span>Serviço *</span>
+      <select name="id_servico" required>
+        <option value="">Selecione…</option>
+        {% for s in servicos %}<option value="{{ s.id_servico }}" {{ 'selected' if ag.id_servico == s.id_servico }}>{{ s.nome }} · {{ s.duracao_min }} min · {{ s.preco|moeda }}</option>{% endfor %}
+      </select>
+    </label>
+    <label class="campo">
+      <span>Profissional *</span>
+      <select name="id_profissional" required>
+        <option value="">Selecione…</option>
+        {% for p in profissionais %}<option value="{{ p.id_profissional }}" {{ 'selected' if ag.id_profissional == p.id_profissional }}>{{ p.nome }}{{ ' (inativo)' if not p.ativo }}</option>{% endfor %}
+      </select>
+    </label>
+    <div class="grade-2 sem-margem">
+      <label class="campo">
+        <span>Data *</span>
+        <input type="date" name="data" required value="{{ ag.data or '' }}">
+      </label>
+      <label class="campo">
+        <span>Horário *</span>
+        <input type="time" name="hora" required step="300" value="{{ ag.hora or '' }}">
+      </label>
+    </div>
+  </div>
+
+  <div class="horarios" id="horarios" hidden>
+    <span class="sutil">Horários livres:</span>
+    <div class="horarios-lista" id="horarios-lista"></div>
+  </div>
+
+  <label class="campo">
+    <span>Observação</span>
+    <input type="text" name="observacao" maxlength="255" value="{{ ag.observacao or '' }}" placeholder="Ex.: prefere máquina 2 nas laterais">
+  </label>
+
+  <div class="rodape-form">
+    <a class="btn" href="{{ url_for('agendamentos.listar', data=ag.data) }}">Voltar</a>
+    <button class="btn btn-primario" type="submit">Salvar agendamento</button>
+  </div>
+</form>
+
+{% if id_agendamento %}
+<form method="post" action="{{ url_for('agendamentos.excluir', id_agendamento=id_agendamento) }}" class="zona-perigo" data-confirmar="Excluir definitivamente este agendamento? (Para manter o histórico, prefira Cancelar.)">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button class="btn-link perigo">Excluir agendamento</button>
+</form>
+{% endif %}
+{% endblock %}

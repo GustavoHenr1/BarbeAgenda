@@ -1,0 +1,47 @@
+{# Tabela de agendamentos reutilizada no painel e na agenda. Espera: agenda, voltar #}
+{% if agenda %}
+<div class="tabela-wrap">
+<table class="tabela">
+  <thead>
+    <tr><th>Horário</th><th>Cliente</th><th>Serviço</th><th>Profissional</th><th class="num">Valor</th><th>Status</th><th class="acoes-col">Ações</th></tr>
+  </thead>
+  <tbody>
+  {% for a in agenda %}
+    <tr class="linha-{{ a.status|lower }}">
+      <td class="hora"><strong>{{ a.hora }}</strong><span class="sutil"> – {{ a.hora_fim }}</span></td>
+      <td><a href="{{ url_for('clientes.detalhe', id_cliente=a.id_cliente) }}">{{ a.cliente }}</a><div class="sutil pequeno">{{ a.cliente_telefone }}</div></td>
+      <td>{{ a.servico }}{% if a.observacao %}<div class="sutil pequeno">{{ a.observacao }}</div>{% endif %}</td>
+      <td data-rotulo="Profissional">{{ a.profissional }}</td>
+      <td class="num" data-rotulo="Valor">{{ a.preco|moeda }}</td>
+      <td><span class="selo selo-{{ a.status|lower }}">{{ {'AGENDADO':'Agendado','CONCLUIDO':'Concluído','CANCELADO':'Cancelado'}[a.status] }}</span></td>
+      <td class="acoes-cel"><div class="acoes">
+        {% if a.status == 'AGENDADO' %}
+          <form method="post" action="{{ url_for('agendamentos.alterar_status', id_agendamento=a.id_agendamento) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="status" value="CONCLUIDO"><input type="hidden" name="voltar" value="{{ voltar }}">
+            <button class="btn btn-mini btn-ok" title="Marcar como concluído">Concluir</button>
+          </form>
+          <a class="btn btn-mini" href="{{ url_for('agendamentos.formulario', id_agendamento=a.id_agendamento) }}">Editar</a>
+          <form method="post" action="{{ url_for('agendamentos.alterar_status', id_agendamento=a.id_agendamento) }}" data-confirmar="Cancelar o agendamento de {{ a.cliente }} às {{ a.hora }}?">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="status" value="CANCELADO"><input type="hidden" name="voltar" value="{{ voltar }}">
+            <button class="btn btn-mini btn-perigo-suave">Cancelar</button>
+          </form>
+        {% else %}
+          <form method="post" action="{{ url_for('agendamentos.alterar_status', id_agendamento=a.id_agendamento) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="status" value="AGENDADO"><input type="hidden" name="voltar" value="{{ voltar }}">
+            <button class="btn btn-mini" title="Voltar para agendado">Reabrir</button>
+          </form>
+        {% endif %}
+      </div></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+  <div class="vazio">
+    <p>Nenhum agendamento para este dia.</p>
+  </div>
+{% endif %}

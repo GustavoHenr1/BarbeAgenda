@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block titulo %}Entrar{% endblock %}
+{% block publico %}
+<div class="login-pagina">
+  <div class="login-lado">
+    <div class="marca marca-grande"><span class="marca-icone">✂</span><span>Barber<strong>Agenda</strong></span></div>
+    <p>A agenda da sua barbearia em um só lugar: clientes, barbeiros, serviços e horários sem conflito.</p>
+  </div>
+  <div class="login-form-area">
+    <form method="post" class="cartao login-cartao" novalidate>
+      <h1>Entrar</h1>
+      <p class="sutil">Use seu login e senha para acessar o sistema.</p>
+      {% include "_mensagens.html" %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label class="campo">
+        <span>Login</span>
+        <input type="text" name="login" autocomplete="username" required autofocus value="{{ request.form.login or '' }}">
+      </label>
+      <label class="campo">
+        <span>Senha</span>
+        <input type="password" name="senha" autocomplete="current-password" required>
+      </label>
+      <button type="submit" class="btn btn-primario btn-bloco">Entrar</button>
+      <p class="dica">Primeiro acesso: <code>admin</code> / <code>admin123</code></p>
+    </form>
+  </div>
+</div>
+{% endblock %}

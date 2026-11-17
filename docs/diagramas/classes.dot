@@ -1,0 +1,38 @@
+digraph G {
+  rankdir=TB; nodesep=0.6; ranksep=0.9; bgcolor="white";
+  node [shape=plain, fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=10, color="#444444"];
+  Usuario [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#FFF8EE">
+   <tr><td bgcolor="#A8641C"><font color="white"><b>Usuario</b></font></td></tr>
+   <tr><td align="left" balign="left">- idUsuario: int<br/>- nome: String<br/>- login: String<br/>- senhaHash: String<br/>- perfil: Perfil</td></tr>
+   <tr><td align="left" balign="left" border="1" sides="T">+ autenticar(login, senha): Usuario<br/>+ buscar(id): Usuario</td></tr></table>>];
+  Cliente [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#FFF8EE">
+   <tr><td bgcolor="#A8641C"><font color="white"><b>Cliente</b></font></td></tr>
+   <tr><td align="left" balign="left">- idCliente: int<br/>- nome: String<br/>- telefone: String<br/>- email: String<br/>- dataCadastro: DateTime</td></tr>
+   <tr><td align="left" balign="left" border="1" sides="T">+ listar(busca): List<br/>+ salvar(dados): int<br/>+ excluir(id): void<br/>+ validar(dados): List</td></tr></table>>];
+  Profissional [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#FFF8EE">
+   <tr><td bgcolor="#A8641C"><font color="white"><b>Profissional</b></font></td></tr>
+   <tr><td align="left" balign="left">- idProfissional: int<br/>- nome: String<br/>- telefone: String<br/>- especialidade: String<br/>- ativo: boolean</td></tr>
+   <tr><td align="left" balign="left" border="1" sides="T">+ listar(somenteAtivos): List<br/>+ salvar(dados): int<br/>+ excluir(id): void</td></tr></table>>];
+  Servico [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#FFF8EE">
+   <tr><td bgcolor="#A8641C"><font color="white"><b>Servico</b></font></td></tr>
+   <tr><td align="left" balign="left">- idServico: int<br/>- nome: String<br/>- descricao: String<br/>- preco: Decimal<br/>- duracaoMin: int</td></tr>
+   <tr><td align="left" balign="left" border="1" sides="T">+ listar(): List<br/>+ salvar(dados): int<br/>+ excluir(id): void</td></tr></table>>];
+  Agendamento [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#FFF8EE">
+   <tr><td bgcolor="#A8641C"><font color="white"><b>Agendamento</b></font></td></tr>
+   <tr><td align="left" balign="left">- idAgendamento: int<br/>- dataHora: DateTime<br/>- status: StatusAgendamento<br/>- observacao: String<br/>- criadoEm: DateTime</td></tr>
+   <tr><td align="left" balign="left" border="1" sides="T">+ salvar(dados, usuario): int<br/>+ temConflito(prof, inicio, duracao): boolean<br/>+ alterarStatus(novoStatus): void<br/>+ horariosLivres(prof, servico, dia): List<br/>+ resumoDia(dia): Resumo</td></tr></table>>];
+  Status [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#F3F3F3">
+   <tr><td><i>«enumeration»</i><br/><b>StatusAgendamento</b></td></tr>
+   <tr><td align="left" balign="left" border="1" sides="T">AGENDADO<br/>CONCLUIDO<br/>CANCELADO</td></tr></table>>];
+  Perfil [label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="4" bgcolor="#F3F3F3">
+   <tr><td><i>«enumeration»</i><br/><b>Perfil</b></td></tr>
+   <tr><td align="left" balign="left" border="1" sides="T">ADMIN<br/>ATENDENTE</td></tr></table>>];
+  {rank=same; Cliente; Profissional; Servico;}
+  Cliente -> Agendamento [dir=none, taillabel="1", headlabel="0..*", label="  possui", labeldistance=2];
+  Profissional -> Agendamento [dir=none, taillabel="1", headlabel="0..*", label="  realiza", labeldistance=2];
+  Servico -> Agendamento [dir=none, taillabel="1", headlabel="0..*", label="  refere-se a", labeldistance=2];
+  Agendamento -> Usuario [dir=none, taillabel="0..*", headlabel="1", label="  registrado por", labeldistance=2];
+  Agendamento -> Status [style=dashed, arrowhead=vee, label=" usa"];
+  Usuario -> Perfil [style=dashed, arrowhead=vee, label=" usa"];
+}

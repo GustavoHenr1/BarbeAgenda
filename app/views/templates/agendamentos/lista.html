@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block titulo %}Agenda{% endblock %}
+{% block conteudo %}
+<div class="cabecalho">
+  <div>
+    <p class="sobretitulo">Agenda</p>
+    <h1>{{ dia|dia_semana|capitalize }}, {{ dia|data_br }}</h1>
+  </div>
+  <a class="btn btn-primario" href="{{ url_for('agendamentos.formulario', data=dia.isoformat()) }}">+ Novo agendamento</a>
+</div>
+
+<form class="filtros cartao" method="get">
+  <div class="navegacao-dia">
+    <a class="btn btn-mini" href="{{ url_for('agendamentos.listar', data=dia_anterior.isoformat(), profissional=filtro_prof, status=filtro_status) }}" aria-label="Dia anterior">←</a>
+    <input type="date" name="data" value="{{ dia.isoformat() }}" data-auto-submit>
+    <a class="btn btn-mini" href="{{ url_for('agendamentos.listar', data=dia_seguinte.isoformat(), profissional=filtro_prof, status=filtro_status) }}" aria-label="Próximo dia">→</a>
+    <a class="btn btn-mini" href="{{ url_for('agendamentos.listar') }}">Hoje</a>
+  </div>
+  <label class="campo-inline">Profissional
+    <select name="profissional" data-auto-submit>
+      <option value="">Todos</option>
+      {% for p in profissionais %}<option value="{{ p.id_profissional }}" {{ 'selected' if filtro_prof == p.id_profissional }}>{{ p.nome }}</option>{% endfor %}
+    </select>
+  </label>
+  <label class="campo-inline">Status
+    <select name="status" data-auto-submit>
+      <option value="">Todos</option>
+      {% for s, rotulo in [('AGENDADO','Agendado'),('CONCLUIDO','Concluído'),('CANCELADO','Cancelado')] %}
+      <option value="{{ s }}" {{ 'selected' if filtro_status == s }}>{{ rotulo }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <noscript><button class="btn btn-mini">Filtrar</button></noscript>
+</form>
+
+<section class="indicadores indicadores-compactos">
+  <div class="indicador"><span class="indicador-rotulo">Atendimentos</span><span class="indicador-valor">{{ resumo.total }}</span></div>
+  <div class="indicador"><span class="indicador-rotulo">Concluídos</span><span class="indicador-valor">{{ resumo.concluidos }}</span></div>
+  <div class="indicador"><span class="indicador-rotulo">Cancelados</span><span class="indicador-valor">{{ resumo.cancelados }}</span></div>
+  <div class="indicador"><span class="indicador-rotulo">Faturado / previsto</span><span class="indicador-valor">{{ resumo.faturamento_realizado|moeda }} <small>/ {{ resumo.faturamento_previsto|moeda }}</small></span></div>
+</section>
+
+<section class="cartao">
+  {% with voltar=request.full_path %}{% include "_agenda_tabela.html" %}{% endwith %}
+</section>
+{% endblock %}
